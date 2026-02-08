@@ -31,8 +31,7 @@ public class NPCController : MonoBehaviour
 
     [Header("Detection")]
     public float detectionRadius = 10f;
-    public float loseSightSeconds = 3f; // kept for tuning but no longer used to give up early
-    public float maxChaseDistance = 30f;
+    public float loseSightSeconds = 3f; // legacy, not used for giving up
     public float attackRange = 1.5f;
     public LayerMask losObstacles = ~0; // obstacles to block LOS
     public Transform eyePoint; // optional custom origin for LOS ray
@@ -41,6 +40,10 @@ public class NPCController : MonoBehaviour
     [Header("Animation (optional)")]
     public Animator animator;
     public string runningBool = "Running";
+
+    [Header("Reset Logic")]
+    // Simple reset countdown while searching; when it hits 0, return to patrol
+    public float searchResetSeconds = 3f;
 
     private NavMeshAgent agent;
     private NPCState state = NPCState.Patrol;
@@ -53,6 +56,9 @@ public class NPCController : MonoBehaviour
     // Track the last known player position for rerouting/search
     private bool hasLastKnownPlayerPos = false;
     private Vector3 lastKnownPlayerPos;
+
+    // countdown timer used in Search state
+    private float searchTimer = 0f;
 
     void Awake()
     {
@@ -225,7 +231,6 @@ public class NPCController : MonoBehaviour
             lastPathRequestTime = Time.time;
         }
 
-        float distToPlayer = Vector3.Distance(transform.position, player.position);
         bool hasLOS = HasLineOfSight();
 
         if (hasLOS)
@@ -242,11 +247,14 @@ public class NPCController : MonoBehaviour
                 state = NPCState.Search;
                 agent.isStopped = false;
                 SetDestinationSafe(lastKnownPlayerPos);
+                // start/reset search countdown
+                searchTimer = Mathf.Max(0f, searchResetSeconds);
                 return;
             }
         }
 
         // Attack range: stop and "react" (no combat implemented)
+        float distToPlayer = Vector3.Distance(transform.position, player.position);
         if (distToPlayer <= attackRange)
         {
             agent.isStopped = true;
@@ -277,27 +285,39 @@ public class NPCController : MonoBehaviour
             return;
         }
 
-        // Head to last known player position. When reached, return to patrol.
-        if (!hasLastKnownPlayerPos)
+        // Head to last known player position
+        if (hasLastKnownPlayerPos)
         {
-            ReturnToPatrol();
-            return;
-        }
+            // countdown and reset when it hits 0
+            if (searchTimer > 0f)
+            {
+                searchTimer -= Time.deltaTime;
+                if (searchTimer <= 0f)
+                {
+                    hasLastKnownPlayerPos = false;
+                    ReturnToPatrol();
+                    return;
+                }
+            }
 
-        // If close enough to last known position, finish search and give up
-        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
-        {
-            hasLastKnownPlayerPos = false;
-            ReturnToPatrol();
-            return;
-        }
+            // If close enough to last known position, also give up
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                hasLastKnownPlayerPos = false;
+                ReturnToPatrol();
+                return;
+            }
 
-        // If path becomes invalid while searching, retry after cooldown
-        HandlePathStatusRecovery(() =>
-        {
-            if (hasLastKnownPlayerPos)
+            // If path becomes invalid while searching, retry after cooldown
+            HandlePathStatusRecovery(() =>
+            {
                 SetDestinationSafe(lastKnownPlayerPos);
-        });
+            });
+        }
+        else
+        {
+            ReturnToPatrol();
+        }
     }
 
     private void ReturnToPatrol()
@@ -305,6 +325,8 @@ public class NPCController : MonoBehaviour
         state = NPCState.Patrol;
         agent.speed = patrolSpeed;
         agent.isStopped = false;
+        // Reset search timer on patrol
+        searchTimer = 0f;
         if (waypoints != null && waypoints.Length > 0)
         {
             SetDestinationSafe(waypoints[currentWaypointIndex].position);
@@ -326,8 +348,10 @@ public class NPCController : MonoBehaviour
         // Detect partial/invalid path and retry after a brief cooldown
         if (agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.pathStatus == NavMeshPathStatus.PathPartial)
         {
+            // Debug the reroute condition once per cooldown
             if (Time.time - lastPathRequestTime > pathRecalcCooldown)
             {
+                Debug.Log($"[NPCController] Path {agent.pathStatus} detected. Rerouting from {transform.position} to new target.");
                 lastPathRequestTime = Time.time;
                 retryAction?.Invoke();
             }

@@ -392,15 +392,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3235965575132470314, guid: 1c443c3abb862244aa6185fe28d5f5bb, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.4873514
+      value: 12.81
       objectReference: {fileID: 0}
     - target: {fileID: 3235965575132470314, guid: 1c443c3abb862244aa6185fe28d5f5bb, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.050002098
+      value: 3.39
       objectReference: {fileID: 0}
     - target: {fileID: 3235965575132470314, guid: 1c443c3abb862244aa6185fe28d5f5bb, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12.4595785
+      value: 5.35
       objectReference: {fileID: 0}
     - target: {fileID: 3235965575132470314, guid: 1c443c3abb862244aa6185fe28d5f5bb, type: 3}
       propertyPath: m_LocalRotation.w
@@ -498,6 +498,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &919460368
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 919460369}
+  m_Layer: 0
+  m_Name: PathPatrol (3)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &919460369
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919460368}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 11.42, y: 3.263, z: 4.962}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1018984789
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -587,7 +618,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!208 &1469695534
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -687,8 +718,8 @@ Transform:
   m_GameObject: {fileID: 1469695533}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 10.265, y: 0.683, z: 12.515}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 10.265, y: 0.683, z: 15.26}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -732,6 +763,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 13485564214826576, guid: 52ec3907cd054be41ab76a8894c1d8e4, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.35168
+      objectReference: {fileID: 0}
     - target: {fileID: 88157093107436311, guid: 52ec3907cd054be41ab76a8894c1d8e4, type: 3}
       propertyPath: m_Name
       value: Level
@@ -774,6 +809,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3663855100926318145, guid: 52ec3907cd054be41ab76a8894c1d8e4, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7419389329527505671, guid: 52ec3907cd054be41ab76a8894c1d8e4, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -843,8 +882,9 @@ MonoBehaviour:
   - {fileID: 1482226807}
   - {fileID: 1758765185}
   - {fileID: 1715065927}
-  patrolSpeed: 2.5
-  chaseSpeed: 4.5
+  - {fileID: 919460369}
+  patrolSpeed: 3
+  chaseSpeed: 4
   acceleration: 8
   angularSpeed: 120
   stoppingDistance: 0.5
@@ -852,9 +892,8 @@ MonoBehaviour:
   pingPong: 0
   waitAtWaypointSeconds: 1.5
   randomizeWaypoints: 0
-  detectionRadius: 10
-  loseSightSeconds: 3
-  maxChaseDistance: 30
+  detectionRadius: 30
+  loseSightSeconds: 60
   attackRange: 1.5
   losObstacles:
     serializedVersion: 2
@@ -863,6 +902,7 @@ MonoBehaviour:
   fieldOfViewAngle: 120
   animator: {fileID: 1582215243}
   runningBool: Running
+  searchResetSeconds: 0
 --- !u!1 &1683996305
 GameObject:
   m_ObjectHideFlags: 0
@@ -1113,3 +1153,4 @@ SceneRoots:
   - {fileID: 1758765185}
   - {fileID: 1469695538}
   - {fileID: 1715065927}
+  - {fileID: 919460369}
